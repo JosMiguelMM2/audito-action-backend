@@ -27,6 +27,11 @@ function authenticate(username, password, callback) {
     });
 }
 
+
+app.get('/', (req, res)=>{
+    console.log("_______________________________________________")
+    res.send({mensaje:"Hola mundo"})
+})
 // Ruta para iniciar sesión
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
@@ -47,6 +52,6 @@ app.post('/login', (req, res) => {
 
 // Iniciar el servidor
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+app.listen(PORT,'0' () => {
     console.log(`Servidor ejecutándose en el puerto ${PORT}`);
 });
