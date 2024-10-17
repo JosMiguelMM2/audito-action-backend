@@ -14,7 +14,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Configuración del servidor LDAP (modificar según tu dominio y servidor AD)
-const LDAP_URL = 'ldap://INFOSECURE0';
+const LDAP_URL = 'ldap://INFOSECURE0.infosecure.com';
 const LDAP_BASE_DN = 'dc=infosecure,dc=com';
 
 app.post('/login', (req, res) => {
@@ -37,11 +37,11 @@ app.post('/login', (req, res) => {
     client.bind(userDN, password, (err) => {
         if (err) {
             console.error('Error en la autenticación:', err);
-            return res.status(401).send('Credenciales inválidas.'); // Mensaje genérico
+            return res.status(401).send({mensage:'Credenciales inválidas.'}); // Mensaje genérico
         }
 
         // Si la autenticación es exitosa
-        res.status(200).send('Autenticación exitosa');
+        res.status(200).send({mensaje:'Autenticación exitosa'});
         
         // Desconectar del cliente LDAP después de la autenticación
         client.unbind((unbindErr) => {
