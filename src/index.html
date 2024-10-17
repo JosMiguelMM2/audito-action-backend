@@ -154,20 +154,25 @@
             event.preventDefault();
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
-
-            const bodypecion = {
+    
+            const myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+    
+            const raw = JSON.stringify({
                 username: username,
                 password: password
-            };
-
-            fetch('http://192.168.20.14:3000/login', {
+            });
+    
+            const requestOptions = {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(bodypecion)
-            })
+                headers: myHeaders,
+                body: raw,
+                redirect: 'follow'
+            };
+    
+            fetch('http://192.168.20.14:3000/login', requestOptions)
                 .then(response => {
+                    console.log("Hola   ")
                     if (response.status === 200) {
                         return response.json();
                     } else {
@@ -188,7 +193,7 @@
                     errorMessage.textContent = 'Usuario o contraseña incorrectos';
                 });
         });
-
+    
         document.getElementById('logoutButton').addEventListener('click', function () {
             document.getElementById('welcomeContainer').style.display = 'none';
             document.getElementById('loginContainer').style.display = 'block';

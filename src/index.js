@@ -6,7 +6,7 @@ const app = express();
 
 // configuracion de cors
 app.use(cors({
-    origin:    'ldap://infosecure.com',  
+    origin:    '*',  
     methods: 'GET,POST', 
     allowedHeaders: 'Content-Type', 
 }));
