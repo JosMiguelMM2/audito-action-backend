@@ -14,7 +14,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Configuración del servidor LDAP (modificar según tu dominio y servidor AD)
-const LDAP_URL = 'ldap://INFOSECURE0.infosecure.com';
+const LDAP_URL = 'ldap://infosecure.com';
 const LDAP_BASE_DN = 'dc=infosecure,dc=com';
 
 app.post('/login', (req, res) => {
