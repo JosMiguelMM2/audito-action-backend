@@ -30,7 +30,7 @@ app.post('/login', (req, res) => {
         url: LDAP_URL
     });
     console.log(`Usuario: ${username}, Contraseña: ${password}`);
-    const userDN = `infosecure\\${username}`; // Usar la barra invertida doble para escapar
+    const userDN = `INFOSECURE0\\${username}`; // Usar la barra invertida doble para escapar
 
     console.log("usuario ", userDN)
     // Intentar autenticar al usuario
