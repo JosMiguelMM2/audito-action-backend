@@ -1,175 +1,58 @@
-/*import ldap from 'ldapjs';
-import express from 'express';
-import dotenv from 'dotenv';
-
-// Cargar variables de entorno
-dotenv.config();
-
-const app = express();
-app.use(express.json()); // Para procesar solicitudes JSON
-
-// Configuración del cliente LDAP
-const client = ldap.createClient({
-    url: process.env.LDAP_URL
-});
-
-// Función de autenticación LDAP
-function authenticate(username, password, callback) {
-    const userDN = `CN=${username},${process.env.LDAP_BASE_DN}`;
-
-    // Intentar la conexión con las credenciales del usuario
-    client.bind(userDN, password, (err) => {
-        if (err) {
-            callback(err, null);
-        } else {
-            callback(null, `Usuario ${username} autenticado exitosamente.`);
-        }
-    });
-}
-
-
-app.get('/', (req, res)=>{
-    console.log("_______________________________________________")
-    res.send({mensaje:"Hola mundo"})
-})
-// Ruta para iniciar sesión
-app.post('/login', (req, res) => {
-    const { username, password } = req.body;
-
-    if (!username || !password) {
-        return res.status(400).json({ message: 'Faltan credenciales' });
-    }
-
-    // Llamar a la función de autenticación
-    authenticate(username, password, (err, success) => {
-        if (err) {
-            return res.status(401).json({ message: 'Error de autenticación' });
-        } else {
-            return res.status(200).json({ message: success });
-        }
-    });
-});
-
-// Iniciar el servidor
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, '0.0.0.0',() => {
-    console.log(`Servidor ejecutándose en el puerto ${PORT}`);
-});*/
-
-
-/*const ldap = require('ldapjs');
 const express = require('express');
-const dotenv = require('dotenv');
-
-// Cargar variables de entorno
-dotenv.config();
-
-const app = express();
-app.use(express.json()); // Para procesar solicitudes JSON
-
-// Configuración del cliente LDAP
-const client = ldap.createClient({
-    url: process.env.LDAP_URL
-});
-
-// Función de autenticación LDAP
-function authenticate(username, password, callback) {
-    const userDN = `CN=${username},${process.env.LDAP_BASE_DN}`;
-
-    // Intentar la conexión con las credenciales del usuario
-    client.bind(userDN, password, (err) => {
-        if (err) {
-            callback(err, null);
-        } else {
-            callback(null, `Usuario ${username} autenticado exitosamente.`);
-        }
-    });
-}
-
-app.get('/', (req, res) => {
-    console.log("_______________________________________________")
-    res.send({ mensaje: "Hola mundo" })
-})
-
-// Ruta para iniciar sesión
-app.post('/login', (req, res) => {
-    const { username, password } = req.body;
-
-    if (!username || !password) {
-        return res.status(400).json({ message: 'Faltan credenciales' });
-    }
-
-    // Llamar a la función de autenticación
-    authenticate(username, password, (err, success) => {
-        if (err) {
-            return res.status(401).json({ message: 'Error de autenticación' });
-        } else {
-            return res.status(200).json({ message: success });
-        }
-    });
-});
-
-// Iniciar el servidor
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Servidor ejecutándose en el puerto ${PORT}`);
-});*/
-
 const ldap = require('ldapjs');
-const express = require('express');
-const dotenv = require('dotenv');
-
-// Cargar variables de entorno
-dotenv.config();
+const bodyParser = require('body-parser');
+const cors = require('cors'); // Importar cors
 
 const app = express();
-app.use(express.json()); // Para procesar solicitudes JSON
+app.use(cors({
+    origin:    'ldap://infosecure.com',  //'http://exptech.local', // Permitir solicitudes desde este origen
+    methods: 'GET,POST', // Métodos permitidos
+    allowedHeaders: 'Content-Type', // Encabezados permitidos
+}));
 
-// Configuración del cliente LDAP
-const client = ldap.createClient({
-    url: process.env.LDAP_URL // URL del servidor LDAP
-});
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-// Función de autenticación LDAP
-function authenticate(username, password, callback) {
-    // Construir el DN del usuario usando el nombre y el DN base
-    const userDN = `CN=${username},${process.env.LDAP_BASE_DN}`; // DN del usuario
+// Configuración del servidor LDAP (modificar según tu dominio y servidor AD)
+const LDAP_URL = 'ldap://infosecure.com';
+//const LDAP_BASE_DN = 'dc=infosecure,dc=com';
 
-    // Intentar la conexión con las credenciales del usuario
-    client.bind(userDN, password, (err) => {
-        if (err) {
-            callback(err, null); // Si hay error, devolvemos el error
-        } else {
-            callback(null, `Usuario ${username} autenticado exitosamente.`);
-        }
-    });
-}
-
-app.get('/', (req, res) => {
-    res.send({ mensaje: "Hola mundo" });
-});
-
-// Ruta para iniciar sesión
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
 
-    // Validación de las credenciales
+    // Validación simple de entrada
     if (!username || !password) {
-        return res.status(400).json({ message: 'Faltan credenciales' });
+        return res.status(400).send('Usuario y contraseña son requeridos.');
     }
 
-    // Llamar a la función de autenticación
-    authenticate(username, password, (err, success) => {
+    // Crear un cliente LDAP
+    const client = ldap.createClient({
+        url: LDAP_URL
+    });
+    console.log(`Usuario: ${username}, Contraseña: ${password}`);
+    const userDN = `INFOSECURE0\\${username}`; // Usar la barra invertida doble para escapar
+
+    console.log("usuario ", userDN)
+    // Intentar autenticar al usuario
+    client.bind(userDN, password, (err) => {
         if (err) {
-            return res.status(401).json({ message: 'Error de autenticación' });
-        } else {
-            return res.status(200).json({ message: success });
+            console.error('Error en la autenticación:', err);
+            return res.status(401).send({mensage:'Credenciales inválidas.'}); // Mensaje genérico
         }
+
+        // Si la autenticación es exitosa
+        res.status(200).send({mensaje:'Autenticación exitosa'});
+        
+        // Desconectar del cliente LDAP después de la autenticación
+        client.unbind((unbindErr) => {
+            if (unbindErr) {
+                console.error('Error al desconectar del cliente LDAP:', unbindErr);
+            }
+        });
     });
 });
 
-// Iniciar el servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Servidor ejecutándose en el puerto ${PORT}`);
+    console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
