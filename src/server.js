@@ -34,16 +34,14 @@ app.post('/login', (req, res) => {
 
     console.log("usuario ", userDN)
     // Intentar autenticar al usuario
-    client.bind(userDN, password, (err) => {
+    client.bind(userDN, password, (err, serverResponse) => {
         if (err) {
             console.error('Error en la autenticación:', err);
-            return res.status(401).send({mensage:'Credenciales inválidas.'}); // Mensaje genérico
+            return res.status(403).send({ mensaje: 'Credenciales inválidas.', error: err });
         }
-
-        // Si la autenticación es exitosa
-        res.status(200).send({mensaje:'Autenticación exitosa'});
-        
-        // Desconectar del cliente LDAP después de la autenticación
+    
+        res.status(200).send({ mensaje: 'Autenticación exitosa', serverResponse: serverResponse });
+    
         client.unbind((unbindErr) => {
             if (unbindErr) {
                 console.error('Error al desconectar del cliente LDAP:', unbindErr);
