@@ -5,7 +5,7 @@ const cors = require('cors'); // Importar cors
 
 const app = express();
 app.use(cors({
-    origin:    'ldap://infosecure.com',  //'http://exptech.local', // Permitir solicitudes desde este origen
+    origin:    '*',  //'http://exptech.local', // Permitir solicitudes desde este origen
     methods: 'GET,POST', // Métodos permitidos
     allowedHeaders: 'Content-Type', // Encabezados permitidos
 }));
